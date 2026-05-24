@@ -1,5 +1,8 @@
 # net-impair
 
+!!! warning
+Not ready for use. In early stages of development.
+
 A cross-platform network impairment tool for testing applications under degraded network conditions. It creates a virtual TUN network interface and applies configurable packet loss, latency, and jitter to all traffic routed through it. A browser-based UI lets you adjust impairments in real time while your application is running.
 
 ## Motivation
