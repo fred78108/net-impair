@@ -23,10 +23,10 @@ All packages are currently stubs. Work roughly top-to-bottom; each layer depends
 
 ## Phase 1 — Go Module Setup
 
-- [ ] Add core Go dependencies to `go.mod` / `go.sum`
+- [x] Add core Go dependencies to `go.mod` / `go.sum`
   - `golang.zx2c4.com/wireguard/tun` — cross-platform TUN interface
   - `golang.org/x/net` — IP packet utilities
-- [ ] Verify `go mod tidy` passes cleanly
+- [ ] Verify `go mod tidy` passes cleanly (delayed until modules implemented)
 
 ---
 
@@ -34,15 +34,15 @@ All packages are currently stubs. Work roughly top-to-bottom; each layer depends
 
 Single source of truth for all impairment parameters. Protected by a `sync.RWMutex` so the engine can read per-packet without blocking and the API can write atomically (see ADR-006).
 
-- [ ] Define `Config` struct
+- [x] Define `Config` struct
   - `LossPercent float64` (0–100)
   - `LatencyMs int`
   - `JitterModel string` (uniform | normal | pareto | pareto-normal | gilbert-elliott)
   - Model-specific fields: `JitterMax`, `JitterMean`, `JitterStddev`, `JitterShape`, `JitterMix`, `GoodDelay`, `BadDelay`, `PGoodToBad`, `PBadToGood`
-- [ ] `NewConfig() *Config` — returns zero-impairment defaults
-- [ ] `Store` wrapper with `RWMutex`: `Load() Config` and `Update(fn func(*Config))` methods
-- [ ] JSON tags on all fields for API serialization
-- [ ] Unit tests: validate mutex behavior under concurrent read/write
+- [x] `NewConfig() *Config` — returns zero-impairment defaults
+- [x] `Store` wrapper with `RWMutex`: `Load() Config` and `Update(fn func(*Config))` methods
+- [x] JSON tags on all fields for API serialization
+- [x] Unit tests: validate mutex behavior under concurrent read/write
 
 ---
 
