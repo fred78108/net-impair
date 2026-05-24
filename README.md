@@ -2,6 +2,16 @@
 
 A cross-platform network impairment tool for testing applications under degraded network conditions. It creates a virtual TUN network interface and applies configurable packet loss, latency, and jitter to all traffic routed through it. A browser-based UI lets you adjust impairments in real time while your application is running.
 
+## Motivation
+
+Earlier in my career I worked as a network engineer. I was fortunate to work with gear that let me introduce network impairments. This helped me test not only network configurations under adverse conditions but also applications that rely on network traversal such as VoIP.
+
+There are tools out there but not none that hit the mark on what I was looking for. This need and a desire to code outside of Python (my primary language over the last few years) motivated this project.
+
+## Status - Under development
+
+This project is under development. Please see [PLAN.md](PLAN.md) for the current status. The overall design and features are subject to change as I dive into this project.
+
 ## Features
 
 - **Packet loss** — drop a configurable percentage of packets
@@ -21,11 +31,11 @@ Application → OS routing table → TUN interface → Impairment engine → Phy
 
 ## Prerequisites
 
-| Platform | Requirement |
-|----------|-------------|
-| Linux | Root or `CAP_NET_ADMIN` capability |
-| macOS | Root (`sudo`) |
-| Windows | Administrator; `wintun.dll` (bundled in the release zip) |
+| Platform | Requirement                                              |
+| -------- | -------------------------------------------------------- |
+| Linux    | Root or `CAP_NET_ADMIN` capability                       |
+| macOS    | Root (`sudo`)                                            |
+| Windows  | Administrator; `wintun.dll` (bundled in the release zip) |
 
 ## Building
 
@@ -156,12 +166,12 @@ Remove-NetRoute -DestinationPrefix "203.0.113.5/32" -Confirm:$false
 
 Select a model in the web UI. Each model exposes only the parameters it uses.
 
-| Model | Description | Good for |
-|-------|-------------|----------|
-| **Uniform** | Random delay in `[0, max]` | Simple testing |
-| **Normal** | Gaussian delay around a mean | Stable Wi-Fi, wired LAN |
-| **Pareto** | Heavy-tailed; occasional large spikes | DSL, cable |
-| **Pareto-Normal** | Mix of Normal and Pareto (tc netem default) | General internet path |
+| Model               | Description                                       | Good for                   |
+| ------------------- | ------------------------------------------------- | -------------------------- |
+| **Uniform**         | Random delay in `[0, max]`                        | Simple testing             |
+| **Normal**          | Gaussian delay around a mean                      | Stable Wi-Fi, wired LAN    |
+| **Pareto**          | Heavy-tailed; occasional large spikes             | DSL, cable                 |
+| **Pareto-Normal**   | Mix of Normal and Pareto (tc netem default)       | General internet path      |
 | **Gilbert-Elliott** | Two-state Markov (good/bad state machine); bursty | Mobile (LTE/5G), satellite |
 
 See [ADR-005](docs/architecture/decisions/ADR-005-jitter-distribution-models.md) for full parameter descriptions.
