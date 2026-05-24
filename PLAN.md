@@ -50,14 +50,14 @@ Single source of truth for all impairment parameters. Protected by a `sync.RWMut
 
 Five independently testable models. Each implements a single-method interface so the engine can swap models without a type switch (see ADR-005).
 
-- [ ] Define `Sampler` interface: `Sample() time.Duration`
-- [ ] Implement `UniformSampler` — `[0, max]`
-- [ ] Implement `NormalSampler` — Gaussian, clamped to `[0, mean+4σ]`
-- [ ] Implement `ParetoSampler` — heavy-tailed, `min` + shape α
-- [ ] Implement `ParetoNormalSampler` — mixed Pareto/Normal with `mix` probability
-- [ ] Implement `GilbertElliottSampler` — two-state Markov; holds mutable state (current state), needs its own mutex if shared
-- [ ] `NewSampler(cfg config.Config) Sampler` — factory that reads jitter fields and returns the right implementation
-- [ ] Unit tests for each sampler: statistical sanity checks (mean within tolerance, no negative samples)
+- [x] Define `Sampler` interface: `Sample() time.Duration`
+- [x] Implement `uniformSampler` — `[0, max]`
+- [x] Implement `normalSampler` — Gaussian, clamped to `≥ 0`
+- [x] Implement `paretoSampler` — heavy-tailed, `min` (mapped from `JitterMean`) + shape α
+- [x] Implement `paretoNormalSampler` — mixed Pareto/Normal with `mix` probability
+- [x] Implement `gilbertElliottSampler` — two-state Markov; `sync.Mutex` guards mutable Markov state
+- [x] `New(cfg config.Config) (Sampler, error)` — registry map lookup; each model registers a `Constructor` func; see ADR-007
+- [x] Unit tests for each sampler: statistical sanity checks (mean within tolerance, no negative samples)
 
 ---
 
@@ -78,7 +78,7 @@ Wraps the wireguard/tun library to present a simple read/write packet interface.
 
 The hot path. Reads packets from the TUN, applies loss/latency/jitter, then writes them back out (or drops them). Each packet is processed independently against the current config snapshot (see ADR-002, ADR-006).
 
-- [ ] `Engine` struct holding a `*tun.Device`, `*config.Store`, and a `*jitter.Sampler` cache
+- [ ] `Engine` struct holding a `*tun.Device`, `*config.Store`, and a `jitter.Sampler` cache
 - [ ] `Run(ctx context.Context)` — main packet loop
   - Read packet from TUN
   - Snapshot config (`store.Load()`)

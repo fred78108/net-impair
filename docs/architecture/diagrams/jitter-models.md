@@ -2,7 +2,7 @@
 
 The active jitter model is selected in the web UI. Each model is independently testable and exposes only its relevant parameters.
 
-Related: [ADR-005](../decisions/ADR-005-jitter-distribution-models.md)
+Related: [ADR-005](../decisions/ADR-005-jitter-distribution-models.md) · [ADR-007](../decisions/ADR-007-jitter-sampler-interface-and-registry.md)
 
 ## Model Selection
 
@@ -36,6 +36,32 @@ flowchart LR
     select -->|"PARETO_NORMAL"| pn
     select -->|"GILBERT_ELLIOTT"| ge
 ```
+
+## Implementation
+
+All models implement a single `Sampler` interface (`internal/jitter`):
+
+```go
+type Sampler interface {
+    Sample() time.Duration
+}
+```
+
+`jitter.New(cfg)` is called once when the config changes. It does a registry map lookup and returns the appropriate `Sampler`. The engine holds the `Sampler` and calls `Sample()` once per packet with no further knowledge of the active model.
+
+**Stateless vs stateful:**
+
+| Model | Stateful | Concurrency mechanism |
+|---|---|---|
+| Uniform | No | `math/rand/v2` globals (goroutine-safe since Go 1.22) |
+| Normal | No | `math/rand/v2` globals |
+| Pareto | No | `math/rand/v2` globals |
+| Pareto-Normal | No | `math/rand/v2` globals |
+| Gilbert-Elliott | **Yes** | `sync.Mutex` guards Markov state |
+
+**Config field mapping — Pareto `min`:**
+
+The Pareto model's `min` parameter (the scale floor) maps to `config.JitterMean` because no dedicated `JitterMin` field exists in the config struct. This is intentional — see ADR-007 for the full field mapping table.
 
 ## Gilbert-Elliott State Machine
 
